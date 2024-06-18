@@ -17,6 +17,8 @@
 		73CAC10B2C2172C800C14F74 /* ApiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CAC10A2C2172C800C14F74 /* ApiModel.swift */; };
 		73CAC10D2C217B3D00C14F74 /* Resnet50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 73CAC10C2C217B3D00C14F74 /* Resnet50.mlmodel */; };
 		73CAC1122C21831000C14F74 /* CoreMLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CAC1112C21831000C14F74 /* CoreMLService.swift */; };
+		73CAC1152C2189E600C14F74 /* MainPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CAC1142C2189E600C14F74 /* MainPresenter.swift */; };
+		73CAC1182C218F5B00C14F74 /* UIViewCont+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73CAC1172C218F5B00C14F74 /* UIViewCont+Ext.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		73CAC10A2C2172C800C14F74 /* ApiModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiModel.swift; sourceTree = "<group>"; };
 		73CAC10C2C217B3D00C14F74 /* Resnet50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Resnet50.mlmodel; sourceTree = "<group>"; };
 		73CAC1112C21831000C14F74 /* CoreMLService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreMLService.swift; sourceTree = "<group>"; };
+		73CAC1142C2189E600C14F74 /* MainPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPresenter.swift; sourceTree = "<group>"; };
+		73CAC1172C218F5B00C14F74 /* UIViewCont+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewCont+Ext.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,9 +69,10 @@
 			isa = PBXGroup;
 			children = (
 				73CAC1092C2172C000C14F74 /* Model */,
+				73CAC1132C21898400C14F74 /* Presenter */,
 				73CAC1032C21714C00C14F74 /* Services */,
-				73CAC1022C2169DB00C14F74 /* View */,
 				73CAC1012C2169CF00C14F74 /* Supporting */,
+				73CAC1022C2169DB00C14F74 /* View */,
 			);
 			path = testingCoreML;
 			sourceTree = "<group>";
@@ -75,6 +80,7 @@
 		73CAC1012C2169CF00C14F74 /* Supporting */ = {
 			isa = PBXGroup;
 			children = (
+				73CAC1162C218F4E00C14F74 /* Extensions */,
 				73CAC1062C2171F500C14F74 /* Constants */,
 				7320A6E82C202B580088E46C /* AppDelegate.swift */,
 				7320A6EA2C202B580088E46C /* SceneDelegate.swift */,
@@ -125,6 +131,22 @@
 				73CAC10C2C217B3D00C14F74 /* Resnet50.mlmodel */,
 			);
 			path = ML;
+			sourceTree = "<group>";
+		};
+		73CAC1132C21898400C14F74 /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				73CAC1142C2189E600C14F74 /* MainPresenter.swift */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		73CAC1162C218F4E00C14F74 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				73CAC1172C218F5B00C14F74 /* UIViewCont+Ext.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -201,6 +223,8 @@
 				73CAC1122C21831000C14F74 /* CoreMLService.swift in Sources */,
 				73CAC1082C2171FD00C14F74 /* Constants.swift in Sources */,
 				7320A6ED2C202B580088E46C /* MainViewController.swift in Sources */,
+				73CAC1182C218F5B00C14F74 /* UIViewCont+Ext.swift in Sources */,
+				73CAC1152C2189E600C14F74 /* MainPresenter.swift in Sources */,
 				7320A6E92C202B580088E46C /* AppDelegate.swift in Sources */,
 				73CAC1052C21715B00C14F74 /* NetworkService.swift in Sources */,
 				73CAC10B2C2172C800C14F74 /* ApiModel.swift in Sources */,

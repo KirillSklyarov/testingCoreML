@@ -7,22 +7,24 @@
 
 import UIKit
 
+protocol MainVCProtocol: AnyObject {
+    func updateWikiText(with wiki: String)
+    func updateTitle(with title: String)
+}
+
 final class MainViewController: UIViewController {
 
     // MARK: - UI Properties
-    private lazy var pictureView: UIImageView = {
-        let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 20
-        view.clipsToBounds = true
-        view.backgroundColor = .blue
-        return view
-    }()
+    private lazy var pictureView = setupImageView()
+    private lazy var placeholder = setupPlaceholder()
+
     private lazy var wikiText: UITextView = {
         let wiki = UITextView()
         wiki.translatesAutoresizingMaskIntoConstraints = false
         wiki.font = .systemFont(ofSize: 25)
-        wiki.textAlignment = .justified
+        wiki.textAlignment = .center
+        wiki.isEditable = false
+        wiki.text = "Скоро здесь появится много интересной информации обо всем на свете!"
         return wiki
     }()
     private lazy var imagePicker: UIImagePickerController = {
@@ -34,13 +36,11 @@ final class MainViewController: UIViewController {
     }()
 
     // MARK: - Other Properties
-    private let network: NetworkService
-    private let coreML: CoreMLService
+    private let presenter: MainPresenterProtocol
 
     // MARK: - Init
-    init(network: NetworkService = NetworkService.shared, coreML: CoreMLService = CoreMLService.shared) {
-        self.network = network
-        self.coreML = coreML
+    init(presenter: MainPresenterProtocol) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -61,36 +61,24 @@ final class MainViewController: UIViewController {
     }
     
     // MARK: - Private methods
-    private func getTextFromWiki(with title: String) {
-        Task {
-            let wikiText = await network.getTitle(with: title)
-            updateUI(with: wikiText)
-        }
-    }
-
-    private func updateUI(with wiki: String) {
-        DispatchQueue.main.async { [weak self] in
-            self?.wikiText.text = wiki
-        }
-    }
-
     private func setupNavigation() {
-        title = "123"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(cameraButtonTapped))
     }
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        view.addSubview(pictureView)
+        pictureView.addSubview(placeholder)
+
+        NSLayoutConstraint.activate([
+            placeholder.centerXAnchor.constraint(equalTo: pictureView.centerXAnchor),
+            placeholder.centerYAnchor.constraint(equalTo: pictureView.centerYAnchor),
+            placeholder.widthAnchor.constraint(equalTo: pictureView.widthAnchor, multiplier: 0.9)
+        ])
+
         view.addSubview(wikiText)
 
         NSLayoutConstraint.activate([
-            pictureView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pictureView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            pictureView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            pictureView.heightAnchor.constraint(equalTo: pictureView.widthAnchor),
-
             wikiText.topAnchor.constraint(equalTo: pictureView.bottomAnchor, constant: 20),
             wikiText.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             wikiText.widthAnchor.constraint(equalTo: pictureView.widthAnchor),
@@ -104,24 +92,31 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { print("tttt"); return }
-        pictureView.image = image
-
-        guard let ciimage = CIImage(image: image) else { return }
-        getNewTitle(image: ciimage)
+        updatePictureView(with: image)
+        presenter.getNewTitle(image: image)
 
         dismiss(animated: true)
     }
 
-    private func getNewTitle(image: CIImage) {
-        let newTitle = coreML.getTitle(image: image)
-        getTextFromWiki(with: newTitle)
-        updateTitle(with: newTitle)
+    private func updatePictureView(with image: UIImage) {
+        DispatchQueue.main.async { [weak self] in
+            self?.pictureView.image = image
+            self?.placeholder.isHidden = true
+        }
+    }
+}
+
+extension MainViewController: MainVCProtocol {
+    
+    func updateWikiText(with wiki: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.wikiText.text = wiki
+        }
     }
 
-    private func updateTitle(with title: String) {
+    func updateTitle(with title: String) {
         DispatchQueue.main.async { [weak self] in
             self?.title = title.capitalized
         }
     }
-
 }
