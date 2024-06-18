@@ -6,11 +6,10 @@
 //
 
 import UIKit
-import CoreML
-import Vision
 
 final class MainViewController: UIViewController {
 
+    // MARK: - UI Properties
     private lazy var pictureView: UIImageView = {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -19,15 +18,13 @@ final class MainViewController: UIViewController {
         view.backgroundColor = .blue
         return view
     }()
-
     private lazy var wikiText: UITextView = {
         let wiki = UITextView()
         wiki.translatesAutoresizingMaskIntoConstraints = false
-        wiki.backgroundColor = .cyan
         wiki.font = .systemFont(ofSize: 25)
+        wiki.textAlignment = .justified
         return wiki
     }()
-
     private lazy var imagePicker: UIImagePickerController = {
         let picker = UIImagePickerController()
         picker.sourceType = .photoLibrary
@@ -36,22 +33,37 @@ final class MainViewController: UIViewController {
         return picker
     }()
 
-    let network = NetworkService.shared
+    // MARK: - Other Properties
+    private let network: NetworkService
+    private let coreML: CoreMLService
 
+    // MARK: - Init
+    init(network: NetworkService = NetworkService.shared, coreML: CoreMLService = CoreMLService.shared) {
+        self.network = network
+        self.coreML = coreML
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Life cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
         setupUI()
-        getTextFromWiki()
     }
 
+    // MARK: - IB Action
     @objc private func cameraButtonTapped(sender: UIBarButtonItem) {
         present(imagePicker, animated: true)
     }
-
-    private func getTextFromWiki() {
+    
+    // MARK: - Private methods
+    private func getTextFromWiki(with title: String) {
         Task {
-            let wikiText = await network.getTitle()
+            let wikiText = await network.getTitle(with: title)
             updateUI(with: wikiText)
         }
     }
@@ -87,6 +99,7 @@ final class MainViewController: UIViewController {
     }
 }
 
+// MARK: - UIImagePickerControllerDelegate
 extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -94,30 +107,21 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         pictureView.image = image
 
         guard let ciimage = CIImage(image: image) else { return }
-        detect(image: ciimage)
+        getNewTitle(image: ciimage)
 
         dismiss(animated: true)
     }
 
-    func detect(image: CIImage) {
-        let config = MLModelConfiguration()
+    private func getNewTitle(image: CIImage) {
+        let newTitle = coreML.getTitle(image: image)
+        getTextFromWiki(with: newTitle)
+        updateTitle(with: newTitle)
+    }
 
-        guard let model = try? VNCoreMLModel(for: Resnet50(configuration: config).model) else {
-            fatalError("App failed to create a VNCoreMLModel instance")
-        }
-
-        let request = VNCoreMLRequest(model: model) { request, error in
-            guard let results = request.results as? [VNClassificationObservation] else {
-                print("Model failed to process image"); return }
-            print(results)
-        }
-
-        let handler = VNImageRequestHandler(ciImage: image)
-
-        do {
-            try handler.perform([request])
-        } catch {
-            print(error)
+    private func updateTitle(with title: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.title = title.capitalized
         }
     }
+
 }

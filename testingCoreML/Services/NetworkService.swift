@@ -14,10 +14,17 @@ enum NetworkErrors: Error {
     case noWikiData
 }
 
-
 final class NetworkService {
 
     static let shared = NetworkService(); private init() { }
+
+    func getTitle(with title: String) async -> String {
+        guard let data = try? await self.fetchData(for: title),
+              let title = data.query.pages.first?.value.extract else { print(NetworkErrors.noWikiData); return ""}
+        print(title)
+        return title
+    }
+
 
     private func createURL(for keyWord: String, baseURL: String = Constants.Api.url, params: [String: String] = Constants.Api.parameters) -> URL? {
         var updatedParams = params
@@ -43,12 +50,5 @@ final class NetworkService {
             print(NetworkErrors.decodingIssue); return nil}
 
         return model
-    }
-
-    func getTitle() async -> String {
-        guard let data = try? await self.fetchData(),
-              let title = data.query.pages.first?.value.extract else { print(NetworkErrors.noWikiData); return ""}
-        print(title)
-        return title
     }
 }
