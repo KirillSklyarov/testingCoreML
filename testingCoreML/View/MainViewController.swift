@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import CoreML
+import Vision
 
 final class MainViewController: UIViewController {
 
@@ -91,6 +93,31 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { print("tttt"); return }
         pictureView.image = image
 
+        guard let ciimage = CIImage(image: image) else { return }
+        detect(image: ciimage)
+
         dismiss(animated: true)
+    }
+
+    func detect(image: CIImage) {
+        let config = MLModelConfiguration()
+
+        guard let model = try? VNCoreMLModel(for: Resnet50(configuration: config).model) else {
+            fatalError("App failed to create a VNCoreMLModel instance")
+        }
+
+        let request = VNCoreMLRequest(model: model) { request, error in
+            guard let results = request.results as? [VNClassificationObservation] else {
+                print("Model failed to process image"); return }
+            print(results)
+        }
+
+        let handler = VNImageRequestHandler(ciImage: image)
+
+        do {
+            try handler.perform([request])
+        } catch {
+            print(error)
+        }
     }
 }
