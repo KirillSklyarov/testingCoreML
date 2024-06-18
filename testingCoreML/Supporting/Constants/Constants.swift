@@ -16,11 +16,11 @@ struct Constants {
         static let parameters : [String:String] = [
             "format" : "json",
             "action" : "query",
-            "prop" : "extracts",
+            "prop" : "extracts|pageimages",
             "exintro" : "",
             "explaintext" : "",
             "indexpageids" : "",
-            "redirects" : "1" ]
-
+            "redirects" : "1",
+            "pithumbsize": "500"]
     }
 }

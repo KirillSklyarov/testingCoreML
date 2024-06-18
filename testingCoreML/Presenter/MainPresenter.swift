@@ -30,8 +30,9 @@ final class MainPresenter {
     // MARK: - Private methods
     private func getTextFromWiki(with title: String) {
         Task {
-            let wikiText = await network.getTitle(with: title)
-            view?.updateWikiText(with: wikiText)
+            guard let wikiData = await network.getTitle(with: title) else { print("Some problems here"); return }
+            view?.updateWikiText(with: wikiData.title)
+            view?.updateWikiImage(with: wikiData.imageURL)
         }
     }
 }

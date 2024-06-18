@@ -8,16 +8,25 @@
 import Foundation
 
 struct ApiModel: Codable {
-    let query: Query
+    let query: QueryData
 }
 
-struct Query: Codable {
-    let pages: [String: Page]
+struct QueryData: Codable {
+    let pageids: [String]
+    let pages: [String: PageData]
 }
 
-struct Page: Codable {
+struct PageData: Codable {
     let pageid: Int
     let ns: Int
     let title: String
     let extract: String
+    let thumbnail: ThumbnailData?
+    let pageimage: String
+}
+
+struct ThumbnailData: Codable {
+    let source: String
+    let width: Int
+    let height: Int
 }

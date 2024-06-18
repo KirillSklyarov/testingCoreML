@@ -15,25 +15,17 @@ extension UIViewController {
         imageView.layer.cornerRadius = 20
         imageView.clipsToBounds = true
         imageView.layer.borderWidth = 0.5
-        
-        view.addSubview(imageView)
-        
-        NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            imageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
-        ])
-        
+        imageView.contentMode = .scaleAspectFill
+
         return imageView
     }
-    func setupPlaceholder() -> UILabel {
+    func setupPlaceholder(text: String = "Нажми на кнопку, сфоткай что-нить и я тебе все про это расскажу") -> UILabel {
         let holder = UILabel()
-        holder.text = "Нажми на кнопку, сфоткай что-нить и я тебе все про это расскажу"
+        holder.text = text
         holder.translatesAutoresizingMaskIntoConstraints = false
         holder.textAlignment = .center
         holder.numberOfLines = 0
-        holder.font = .systemFont(ofSize: 25)
+        holder.font = .systemFont(ofSize: 15)
 
         return holder
     }

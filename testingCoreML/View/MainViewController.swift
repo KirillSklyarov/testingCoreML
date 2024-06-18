@@ -6,17 +6,22 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol MainVCProtocol: AnyObject {
     func updateWikiText(with wiki: String)
     func updateTitle(with title: String)
+    func updateWikiImage(with url: URL)
 }
 
 final class MainViewController: UIViewController {
 
     // MARK: - UI Properties
-    private lazy var pictureView = setupImageView()
+    private lazy var myPictureView = setupImageView()
+    private lazy var wikiPictureView = setupImageView()
+
     private lazy var placeholder = setupPlaceholder()
+    private lazy var wikiPlaceholder = setupPlaceholder(text: "А тут будет фотка из Википедии")
 
     private lazy var wikiText: UITextView = {
         let wiki = UITextView()
@@ -66,22 +71,47 @@ final class MainViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        let stack = UIStackView(arrangedSubviews: [myPictureView, wikiPictureView])
+        stack.axis = .horizontal
+        stack.distribution = .fillEqually
+        stack.spacing = 5
+        stack.translatesAutoresizingMaskIntoConstraints = false
 
-        pictureView.addSubview(placeholder)
+        view.addSubview(stack)
 
         NSLayoutConstraint.activate([
-            placeholder.centerXAnchor.constraint(equalTo: pictureView.centerXAnchor),
-            placeholder.centerYAnchor.constraint(equalTo: pictureView.centerYAnchor),
-            placeholder.widthAnchor.constraint(equalTo: pictureView.widthAnchor, multiplier: 0.9)
+            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            stack.heightAnchor.constraint(equalToConstant: (view.frame.size.width / 2 - 20))
+        ])
+
+
+
+        view.backgroundColor = .systemBackground
+
+        myPictureView.addSubview(placeholder)
+
+        NSLayoutConstraint.activate([
+            placeholder.centerXAnchor.constraint(equalTo: myPictureView.centerXAnchor),
+            placeholder.centerYAnchor.constraint(equalTo: myPictureView.centerYAnchor),
+            placeholder.widthAnchor.constraint(equalTo: myPictureView.widthAnchor, multiplier: 0.9)
+        ])
+
+        wikiPictureView.addSubview(wikiPlaceholder)
+
+        NSLayoutConstraint.activate([
+            wikiPlaceholder.centerXAnchor.constraint(equalTo: wikiPictureView.centerXAnchor),
+            wikiPlaceholder.centerYAnchor.constraint(equalTo: wikiPictureView.centerYAnchor),
+            wikiPlaceholder.widthAnchor.constraint(equalTo: wikiPictureView.widthAnchor, multiplier: 0.9)
         ])
 
         view.addSubview(wikiText)
 
         NSLayoutConstraint.activate([
-            wikiText.topAnchor.constraint(equalTo: pictureView.bottomAnchor, constant: 20),
-            wikiText.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            wikiText.widthAnchor.constraint(equalTo: pictureView.widthAnchor),
+            wikiText.topAnchor.constraint(equalTo: myPictureView.bottomAnchor, constant: 20),
+            wikiText.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            wikiText.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             wikiText.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
@@ -100,7 +130,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
 
     private func updatePictureView(with image: UIImage) {
         DispatchQueue.main.async { [weak self] in
-            self?.pictureView.image = image
+            self?.myPictureView.image = image
             self?.placeholder.isHidden = true
         }
     }
@@ -111,6 +141,13 @@ extension MainViewController: MainVCProtocol {
     func updateWikiText(with wiki: String) {
         DispatchQueue.main.async { [weak self] in
             self?.wikiText.text = wiki
+        }
+    }
+
+    func updateWikiImage(with url: URL) {
+        DispatchQueue.main.async { [weak self] in
+            self?.wikiPictureView.kf.setImage(with: url)
+            self?.wikiPlaceholder.isHidden = true
         }
     }
 

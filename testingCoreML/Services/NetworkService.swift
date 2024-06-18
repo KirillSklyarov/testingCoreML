@@ -18,13 +18,15 @@ final class NetworkService {
 
     static let shared = NetworkService(); private init() { }
 
-    func getTitle(with title: String) async -> String {
+    func getTitle(with title: String) async -> (title: String, imageURL: URL)? {
         guard let data = try? await self.fetchData(for: title),
-              let title = data.query.pages.first?.value.extract else { print(NetworkErrors.noWikiData); return ""}
-        print(title)
-        return title
+              let title = data.query.pages.first?.value.extract,
+              let imageURL = data.query.pages.first?.value.thumbnail?.source,
+              let url = URL(string: imageURL)
+        else { print(NetworkErrors.noWikiData); return nil }
+        print(title, imageURL)
+        return (title, url)
     }
-
 
     private func createURL(for keyWord: String, baseURL: String = Constants.Api.url, params: [String: String] = Constants.Api.parameters) -> URL? {
         var updatedParams = params
