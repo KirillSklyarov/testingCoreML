@@ -6,3 +6,21 @@
 //
 
 import Foundation
+
+
+struct Constants {
+
+    struct Api {
+        static let url = "https://en.wikipedia.org/w/api.php"
+
+        static let parameters : [String:String] = [
+            "format" : "json",
+            "action" : "query",
+            "prop" : "extracts",
+            "exintro" : "",
+            "explaintext" : "",
+            "indexpageids" : "",
+            "redirects" : "1" ]
+
+    }
+}

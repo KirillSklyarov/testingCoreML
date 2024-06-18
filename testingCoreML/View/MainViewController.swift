@@ -22,6 +22,7 @@ final class MainViewController: UIViewController {
         let wiki = UITextView()
         wiki.translatesAutoresizingMaskIntoConstraints = false
         wiki.backgroundColor = .cyan
+        wiki.font = .systemFont(ofSize: 25)
         return wiki
     }()
 
@@ -33,15 +34,30 @@ final class MainViewController: UIViewController {
         return picker
     }()
 
+    let network = NetworkService.shared
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
         setupNavigation()
         setupUI()
+        getTextFromWiki()
     }
 
     @objc private func cameraButtonTapped(sender: UIBarButtonItem) {
+        present(imagePicker, animated: true)
+    }
 
+    private func getTextFromWiki() {
+        Task {
+            let wikiText = await network.getTitle()
+            updateUI(with: wikiText)
+        }
+    }
+
+    private func updateUI(with wiki: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.wikiText.text = wiki
+        }
     }
 
     private func setupNavigation() {
@@ -70,5 +86,11 @@ final class MainViewController: UIViewController {
 }
 
 extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { print("tttt"); return }
+        pictureView.image = image
 
+        dismiss(animated: true)
+    }
 }
